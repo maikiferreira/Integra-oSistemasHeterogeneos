@@ -1,0 +1,35 @@
+var net = require('net');
+
+var HOST = '192.168.1.103';
+var PORT = 6969;
+
+net.createServer(function(sock){
+	//console.log('CONNECTED: ' + sock.remoteAddress + ':' + sock.remotePort);
+	sock.on('data', function(data){
+		var texto = "";
+		var obj = JSON.parse(data);
+		
+		var alunosMatriculados = 0;
+		for(var i=0; i<obj.alunos.length; i++){
+			if(obj.alunos[i].matriculado == true){
+				alunosMatriculados ++;
+			}
+		}
+
+		texto = "A turma " + obj.id + " de " + obj.ano + " do curso " + obj.curso 
+			  + " possui " + obj.alunos.length + " alunos, dos quais " + alunosMatriculados 
+			  + " estão devidamente matriculados."; 
+		
+		sock.write(data);
+		console.log(texto);
+	});
+
+	
+
+	sock.on('close', function(data){
+		console.log('CLOSED: ' + sock.remoteAddress + ' ' + sock.remotePort);
+	});
+
+}).listen(PORT, HOST);
+
+console.log('Server listening on ' + HOST + ':'
